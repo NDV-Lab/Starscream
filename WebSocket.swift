@@ -268,12 +268,16 @@ public class WebSocket : NSObject, NSStreamDelegate {
         if writeQueue != nil {
             writeQueue!.waitUntilAllOperationsAreFinished()
         }
-        inputStream!.removeFromRunLoop(NSRunLoop.currentRunLoop(), forMode: NSDefaultRunLoopMode)
-        outputStream!.removeFromRunLoop(NSRunLoop.currentRunLoop(), forMode: NSDefaultRunLoopMode)
-        inputStream!.close()
-        outputStream!.close()
-        inputStream = nil
-        outputStream = nil
+        if let input = inputStream {
+            input.removeFromRunLoop(NSRunLoop.currentRunLoop(), forMode: NSDefaultRunLoopMode)
+            input.close()
+            inputStream = nil
+        }
+        if let output = outputStream {
+            output.removeFromRunLoop(NSRunLoop.currentRunLoop(), forMode: NSDefaultRunLoopMode)
+            output.close()
+            outputStream = nil
+        }
         isRunLoop = false
         connected = false
         dispatch_async(queue,{
