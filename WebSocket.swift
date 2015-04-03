@@ -240,12 +240,16 @@ public class WebSocket : NSObject, NSStreamDelegate {
             outputStream!.setProperty(settings, forKey: kCFStreamPropertySSLSettings as! String)
         }
         isRunLoop = true
-        inputStream!.scheduleInRunLoop(NSRunLoop.currentRunLoop(), forMode: NSDefaultRunLoopMode)
-        outputStream!.scheduleInRunLoop(NSRunLoop.currentRunLoop(), forMode: NSDefaultRunLoopMode)
-        inputStream!.open()
-        outputStream!.open()
-        let bytes = UnsafePointer<UInt8>(data.bytes)
-        outputStream!.write(bytes, maxLength: data.length)
+        if let input = inputStream {
+            input.scheduleInRunLoop(NSRunLoop.currentRunLoop(), forMode: NSDefaultRunLoopMode)
+            input.open()
+        }
+        if let output = outputStream {
+            output.scheduleInRunLoop(NSRunLoop.currentRunLoop(), forMode: NSDefaultRunLoopMode)
+            output.open()
+            let bytes = UnsafePointer<UInt8>(data.bytes)
+            output.write(bytes, maxLength: data.length)
+        }
         while(isRunLoop) {
             NSRunLoop.currentRunLoop().runMode(NSDefaultRunLoopMode, beforeDate: NSDate.distantFuture() as! NSDate)
         }
